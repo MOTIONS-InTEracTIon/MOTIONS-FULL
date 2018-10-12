@@ -1,0 +1,45 @@
+﻿using Gamelogic;
+using Memoria.Core;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Leap;
+using Leap.Unity;
+
+public class PlaneVisualizationLoader : GLMonoBehaviour {
+
+    //LeapMotion Configuration
+    public LeapHeadMountedRig leapMotionRig;
+	public LeapHandController leapHandController;
+
+
+    public void LoadInstances()
+    {
+        InterfaceManager.Instance.leapMotionManager.leapMotionRig = leapMotionRig;
+
+        string Scope = ProfileManager.Instance.currentEvaluationScope;
+        if (GLPlayerPrefs.GetBool(Scope, "useMouse"))
+        {
+			Debug.Log ("entre al LoadInstance del PlaneVisualization");
+            InteractionManager.Instance.updateList.Add(() =>
+               InteractionManager.Instance.raycastingSpherePlane.CreateRayCategories(
+               InterfaceManager.Instance.mouseManager.screenPointToRay, VisualizationManager.Instance.planeVisualization.actualVisualization)
+                );
+        }
+
+		if (GLPlayerPrefs.GetBool (Scope, "useTouchScreen")) {
+			Debug.Log ("Entre al LoadInstance del PlanceVisualization con la interfaz touch");
+			InteractionManager.Instance.updateList.Add (() =>
+				InteractionManager.Instance.raycastingSpherePlane.CreateRayCategories (
+				InterfaceManager.Instance.touchScreenManager.screenPointToRay, VisualizationManager.Instance.planeVisualization.actualVisualization)
+			);
+		}
+
+		if (GLPlayerPrefs.GetBool (Scope, "useLeapMotion") && !GLPlayerPrefs.GetBool(Scope, "useOcculusRift")) {
+
+			leapHandController.gameObject.SetActive (true);
+
+		}
+
+    }
+}
